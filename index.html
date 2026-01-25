@@ -1,257 +1,434 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Fysik & Kemi – Träning</title>
 
 <style>
-body{
-  margin:0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-  background:#f4f6fb;
-  color:#1a1a1a;
-}
+  :root{
+    --bg:#f4f6fb;
+    --card:#ffffff;
+    --primary:#4f6df5;
+    --front:#e8ecff;
+    --back:#dff3e8;
+    --txt:#1a1a1a;
+    --muted:#667085;
+    --radius:14px;
+    --shadow:0 8px 20px rgba(16,24,40,.08);
+    --gap:10px; /* liten luft mellan flipcards */
+  }
 
-header{
-  background:#4f6df5;
-  color:white;
-  padding:16px;
-  text-align:center;
-  font-weight:600;
-}
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui;
+    background:var(--bg);
+    color:var(--txt);
+  }
 
-section{
-  background:white;
-  margin:12px;
-  padding:16px;
-  border-radius:14px;
-}
+  /* Fixed top menu */
+  .topbar{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    z-index:999;
+    background:var(--primary);
+    color:#fff;
+    padding:10px 12px calc(10px + env(safe-area-inset-top));
+    box-shadow:0 6px 18px rgba(0,0,0,.12);
+  }
+  .title{
+    font-weight:700;
+    text-align:center;
+    padding-top:env(safe-area-inset-top);
+    padding-bottom:8px;
+  }
+  .tabs{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:2px;
+  }
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{
+    flex:0 0 auto;
+    border:1px solid rgba(255,255,255,.35);
+    background:rgba(255,255,255,.14);
+    color:#fff;
+    padding:8px 10px;
+    border-radius:999px;
+    font-size:14px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .tab.active{
+    background:#fff;
+    color:var(--primary);
+    border-color:#fff;
+  }
 
-h2{
-  margin-top:0;
-  font-size:20px;
-}
+  /* Main content area below fixed header */
+  main{
+    padding-top:110px; /* room for fixed menu */
+    padding-bottom:28px;
+  }
+  .page{
+    display:none;
+    margin:12px;
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:16px;
+  }
+  .page.active{display:block}
 
-.flip-grid{
-  display:grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap:10px;
-}
+  h2{
+    margin:0 0 8px 0;
+    font-size:20px;
+  }
+  p{margin:8px 0; line-height:1.35}
 
-.card{
-  perspective:1000px;
-}
+  /* Flipcards */
+  .flip-grid{
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap:var(--gap);        /* luft mellan kort */
+    padding:2px;           /* liten innerkant så kort inte “klistrar” mot container */
+  }
+  .card{ perspective:1000px; }
+  .card-inner{
+    position:relative;
+    width:100%;
+    height:92px;           /* lite högre så text får plats */
+    transform-style:preserve-3d;
+    transition:transform .55s;
+  }
+  .card.flipped .card-inner{ transform:rotateY(180deg); }
+  .card-face{
+    position:absolute;
+    inset:0;
+    backface-visibility:hidden;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:10px;
+    text-align:center;
+    font-weight:650;
+    box-shadow:0 6px 14px rgba(16,24,40,.10);
+  }
+  .front{ background:var(--front); }
+  .back{
+    background:var(--back);
+    transform:rotateY(180deg);
+    font-size:14px;
+    font-weight:600;
+  }
 
-.card-inner{
-  position:relative;
-  width:100%;
-  height:80px;
-  transform-style:preserve-3d;
-  transition:transform 0.6s;
-}
+  /* Atom illustration */
+  .orbit{
+    position:relative;
+    width:140px;
+    height:140px;
+    border:2px dashed #cfd4df;
+    border-radius:50%;
+    margin:14px auto 8px;
+  }
+  .atom-core{
+    width:44px;height:44px;
+    background:#ff6b6b;
+    border-radius:50%;
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    box-shadow:0 10px 18px rgba(255,107,107,.35);
+  }
+  .electron{
+    width:12px;height:12px;
+    background:var(--primary);
+    border-radius:50%;
+    position:absolute;
+    box-shadow:0 8px 14px rgba(79,109,245,.25);
+  }
 
-.card.flipped .card-inner{
-  transform:rotateY(180deg);
-}
+  /* Inputs */
+  input, textarea{
+    width:100%;
+    padding:10px 10px;
+    margin:8px 0 0;
+    border-radius:10px;
+    border:1px solid #d0d5dd;
+    font-size:16px;
+    background:#fff;
+  }
+  button.action{
+    background:var(--primary);
+    color:#fff;
+    border:none;
+    padding:12px;
+    border-radius:12px;
+    font-size:16px;
+    width:100%;
+    margin-top:10px;
+    font-weight:700;
+  }
+  .result{ margin-top:10px; font-weight:800; }
+  .good{ color:#1b8f4a; }
+  .bad{ color:#b42318; }
 
-.card-face{
-  position:absolute;
-  width:100%;
-  height:100%;
-  backface-visibility:hidden;
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:8px;
-  text-align:center;
-  font-weight:500;
-}
+  /* Periodic buttons */
+  .grid3{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+    margin-top:10px;
+  }
+  .chem-btn{
+    border:1px solid #d0d5dd;
+    background:#fff;
+    border-radius:14px;
+    padding:10px;
+    text-align:center;
+    font-weight:800;
+  }
+  .chem-btn small{
+    display:block;
+    margin-top:2px;
+    color:var(--muted);
+    font-weight:700;
+  }
 
-.front{
-  background:#e8ecff;
-}
+  /* Table */
+  table{ width:100%; border-collapse:collapse; margin-top:10px; }
+  th, td{ border:1px solid #e4e7ec; padding:8px; vertical-align:top; }
+  th{ background:#f7f8fb; text-align:left; }
 
-.back{
-  background:#dff3e8;
-  transform:rotateY(180deg);
-  font-size:14px;
-}
-
-.atom{
-  text-align:center;
-}
-
-.atom-core{
-  width:40px;
-  height:40px;
-  background:#ff6b6b;
-  border-radius:50%;
-  margin:20px auto;
-}
-
-.electron{
-  width:12px;
-  height:12px;
-  background:#4f6df5;
-  border-radius:50%;
-  position:absolute;
-}
-
-.orbit{
-  position:relative;
-  width:120px;
-  height:120px;
-  border:2px dashed #ccc;
-  border-radius:50%;
-  margin:auto;
-}
-
-input, textarea{
-  width:100%;
-  padding:8px;
-  margin:6px 0;
-  border-radius:8px;
-  border:1px solid #ccc;
-  font-size:16px;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-}
-
-td, th{
-  border:1px solid #ddd;
-  padding:6px;
-}
-
-button{
-  background:#4f6df5;
-  color:white;
-  border:none;
-  padding:10px;
-  border-radius:10px;
-  font-size:16px;
-  width:100%;
-}
-.result{
-  margin-top:6px;
-  font-weight:600;
-}
-.good{color:green;}
-.bad{color:red;}
+  .hint{
+    font-size:13px;
+    color:var(--muted);
+    margin-top:6px;
+  }
 </style>
 </head>
 
 <body>
 
-<header>Fysik & Kemi – Träna inför prov</header>
-
-<section>
-<h2>📘 Ordlista</h2>
-<div class="flip-grid" id="ordlista"></div>
-</section>
-
-<section>
-<h2>⚛️ Atom</h2>
-<p>En atom är en pytteliten byggsten som allt i världen är uppbyggt av.</p>
-<div class="orbit">
-  <div class="electron" style="top:-6px; left:50%"></div>
-  <div class="electron" style="bottom:-6px; left:50%"></div>
-  <div class="electron" style="left:-6px; top:50%"></div>
-  <div class="electron" style="right:-6px; top:50%"></div>
-  <div class="atom-core"></div>
+<div class="topbar">
+  <div class="title">Fysik & Kemi – Träna inför prov</div>
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-page="ordlista">Ordlista</button>
+    <button class="tab" data-page="atom">Atom</button>
+    <button class="tab" data-page="molekyl">Molekyl</button>
+    <button class="tab" data-page="grundamne">Grundämne</button>
+    <button class="tab" data-page="periodiska">Periodiska</button>
+    <button class="tab" data-page="materia">Materia/Material</button>
+  </div>
 </div>
-</section>
 
-<section>
-<h2>💧 Molekyl</h2>
-<p>När atomer sitter ihop bildar de molekyler.</p>
-<p>Vattenmolekyl: 1 syre + 2 väte = H₂O</p>
-</section>
+<main>
 
-<section>
-<h2>🧪 Grundämnen</h2>
-<p>Skriv tre grundämnen:</p>
-<input id="g1" placeholder="Grundämne 1">
-<input id="g2" placeholder="Grundämne 2">
-<input id="g3" placeholder="Grundämne 3">
-<button onclick="checkElements()">Kontrollera</button>
-<div id="result" class="result"></div>
-</section>
+  <section class="page active" id="page-ordlista">
+    <h2>📘 Ordlista</h2>
+    <p class="hint">Tryck på ett kort för att se förklaringen.</p>
+    <div class="flip-grid" id="ordlista"></div>
+  </section>
 
-<section>
-<h2>📊 Periodiska systemet</h2>
-<p>Klicka på ett ämne:</p>
-<button onclick="alert('Syre används för andning och förbränning')">Syre (O)</button><br><br>
-<button onclick="alert('Järn används till spikar, bilar och byggnader')">Järn (Fe)</button><br><br>
-<button onclick="alert('Koppar används i sladdar och elektronik')">Koppar (Cu)</button>
-</section>
+  <section class="page" id="page-atom">
+    <h2>⚛️ Atom</h2>
+    <p>En atom är en pytteliten byggsten som allt i världen är uppbyggt av.</p>
+    <p class="hint">Atom: tung kärna i mitten + elektroner runt.</p>
 
-<section>
-<h2>🧱 Materia & Material</h2>
-<p><b>Materia:</b> Allt som tar plats och väger något.</p>
-<p><b>Material:</b> Vad saker är gjorda av, t.ex. trä, metall eller plast.</p>
+    <div class="orbit" aria-label="Enkel atomskiss">
+      <div class="electron" style="top:-6px; left:50%; transform:translateX(-50%);"></div>
+      <div class="electron" style="bottom:-6px; left:50%; transform:translateX(-50%);"></div>
+      <div class="electron" style="left:-6px; top:50%; transform:translateY(-50%);"></div>
+      <div class="electron" style="right:-6px; top:50%; transform:translateY(-50%);"></div>
+      <div class="atom-core"></div>
+    </div>
+  </section>
 
-<table>
-<tr><th>Material</th><th>Föremål</th></tr>
-<tr><td><input></td><td><input></td></tr>
-<tr><td><input></td><td><input></td></tr>
-<tr><td><input></td><td><input></td></tr>
-<tr><td><input></td><td><input></td></tr>
-<tr><td><input></td><td><input></td></tr>
-</table>
-</section>
+  <section class="page" id="page-molekyl">
+    <h2>💧 Molekyl</h2>
+    <p>När olika atomer sitter ihop bildar de molekyler.</p>
+    <p><b>Vattenmolekyl:</b> 1 syreatom + 2 väteatomer = <b>H₂O</b></p>
+
+    <!-- enkel skiss -->
+    <div style="display:flex; gap:10px; align-items:center; justify-content:center; margin-top:14px;">
+      <div style="width:44px;height:44px;border-radius:50%;background:#4f6df5;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;">O</div>
+      <div style="width:34px;height:34px;border-radius:50%;background:#ffb020;color:#222;display:flex;align-items:center;justify-content:center;font-weight:900;">H</div>
+      <div style="width:34px;height:34px;border-radius:50%;background:#ffb020;color:#222;display:flex;align-items:center;justify-content:center;font-weight:900;">H</div>
+    </div>
+    <p class="hint" style="text-align:center;">O = syre, H = väte</p>
+  </section>
+
+  <section class="page" id="page-grundamne">
+    <h2>🧪 Grundämne</h2>
+    <p>Ett grundämne är ett ämne som består av <b>en enda sorts atomer</b>.</p>
+    <p class="hint">Skriv tre grundämnen. Appen kollar om de finns i listan.</p>
+
+    <input id="g1" placeholder="Grundämne 1 (t.ex. syre)" />
+    <input id="g2" placeholder="Grundämne 2 (t.ex. järn)" />
+    <input id="g3" placeholder="Grundämne 3 (t.ex. kol)" />
+    <button class="action" onclick="checkElements()">Kontrollera</button>
+    <div id="result" class="result"></div>
+    <div class="hint">Tips från pappret: väte, syre, kol, guld …</div>
+  </section>
+
+  <section class="page" id="page-periodiska">
+    <h2>📊 Periodiska systemet</h2>
+    <p class="hint">Tryck på ett ämne för att se vad det kan användas till.</p>
+
+    <div class="grid3">
+      <button class="chem-btn" type="button" onclick="showUse('Syre (O)','Används för andning och förbränning.')">
+        O<small>Syre</small>
+      </button>
+      <button class="chem-btn" type="button" onclick="showUse('Järn (Fe)','Används till spikar, bilar och byggnader.')">
+        Fe<small>Järn</small>
+      </button>
+      <button class="chem-btn" type="button" onclick="showUse('Koppar (Cu)','Används i sladdar och elektronik.')">
+        Cu<small>Koppar</small>
+      </button>
+      <button class="chem-btn" type="button" onclick="showUse('Kol (C)','Finns i allt levande och i grafit (pennor).')">
+        C<small>Kol</small>
+      </button>
+      <button class="chem-btn" type="button" onclick="showUse('Guld (Au)','Används i smycken och ibland i elektronik.')">
+        Au<small>Guld</small>
+      </button>
+      <button class="chem-btn" type="button" onclick="showUse('Väte (H)','Finns i vatten (H₂O) och i många bränslen.')">
+        H<small>Väte</small>
+      </button>
+    </div>
+
+    <div id="usebox" style="margin-top:12px; padding:12px; border:1px solid #e4e7ec; border-radius:12px; background:#fbfcff;">
+      <b id="useTitle">Välj ett ämne</b>
+      <div id="useText" style="margin-top:6px; color:var(--muted); font-weight:650;"></div>
+    </div>
+  </section>
+
+  <section class="page" id="page-materia">
+    <h2>🧱 Materia & Material</h2>
+
+    <p><b>Materia:</b> Allt som tar plats och väger något.</p>
+    <p class="hint">Viktigt: materia kan inte uppstå eller försvinna, men kan omvandlas.</p>
+
+    <p style="margin-top:12px;"><b>Material:</b> Vad något är gjort av, t.ex. trä, metall, glas eller plast.</p>
+
+    <table>
+      <tr>
+        <th style="width:45%;">Material</th>
+        <th>Föremål (exempel på något av materialet)</th>
+      </tr>
+      <tr><td><input placeholder="t.ex. järn"></td><td><input placeholder="t.ex. spik"></td></tr>
+      <tr><td><input placeholder="Material 2"></td><td><input placeholder="Föremål 2"></td></tr>
+      <tr><td><input placeholder="Material 3"></td><td><input placeholder="Föremål 3"></td></tr>
+      <tr><td><input placeholder="Material 4"></td><td><input placeholder="Föremål 4"></td></tr>
+      <tr><td><input placeholder="Material 5"></td><td><input placeholder="Föremål 5"></td></tr>
+    </table>
+
+    <div class="hint">Den här tabellen är tänkt att en vuxen kan kolla i efterhand.</div>
+  </section>
+
+</main>
 
 <script>
-const words = {
-  "kemisk":"Som har med kemi att göra",
-  "alkemist":"Person som experimenterade förr i tiden",
-  "experiment":"Ett test man gör",
-  "undersökning":"När man tar reda på något",
-  "grotta":"Hålrum i berg",
-  "material":"Det som något är gjort av",
-  "metall":"Ett hårt material",
-  "atom":"Mycket liten byggsten",
-  "molekyl":"Atomer som sitter ihop",
-  "praktisk":"När man gör själv",
-  "skicklig":"Duktig",
-  "gummi":"Mjukt material",
-  "recept":"Instruktion",
-  "återvinna":"Använda igen",
-  "sortera":"Dela upp",
-  "forskare":"Person som undersöker",
-  "förpackning":"Något som skyddar",
-  "periodiska systemet":"Tabell med alla grundämnen",
-  "grundämne":"Ett ämne med en sorts atom",
-  "brasa":"Eld med ved"
-};
+  // Flipcard data (ordlista från bilden)
+  const words = {
+    "kemisk":"Som har med kemi att göra",
+    "alkemist":"Person som experimenterade förr i tiden",
+    "experiment":"Ett test man gör",
+    "undersökning":"När man tar reda på något",
+    "grotta":"Hålrum i berg",
+    "material":"Det som något är gjort av",
+    "metall":"Ett hårt material",
+    "atom":"Mycket liten byggsten",
+    "molekyl":"Atomer som sitter ihop",
+    "praktisk":"När man gör själv",
+    "skicklig":"Duktig",
+    "gummi":"Mjukt material",
+    "recept":"Instruktion",
+    "återvinna":"Använda igen",
+    "sortera":"Dela upp",
+    "forskare":"Person som undersöker",
+    "förpackning":"Något som skyddar",
+    "periodiska systemet":"Tabell med alla grundämnen",
+    "grundämne":"Ett ämne med en sorts atom",
+    "brasa":"Eld med ved"
+  };
 
-const container = document.getElementById("ordlista");
+  // Render flipcards
+  const container = document.getElementById("ordlista");
+  Object.entries(words).forEach(([word, def]) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="card-inner">
+        <div class="card-face front">${word}</div>
+        <div class="card-face back">${def}</div>
+      </div>`;
+    card.addEventListener("click", () => card.classList.toggle("flipped"));
+    container.appendChild(card);
+  });
 
-Object.entries(words).forEach(([word,def])=>{
-  const card=document.createElement("div");
-  card.className="card";
-  card.innerHTML=`
-    <div class="card-inner">
-      <div class="card-face front">${word}</div>
-      <div class="card-face back">${def}</div>
-    </div>`;
-  card.onclick=()=>card.classList.toggle("flipped");
-  container.appendChild(card);
-});
+  // Tabs -> pages
+  const tabs = document.getElementById("tabs");
+  const allTabs = Array.from(tabs.querySelectorAll(".tab"));
+  const pages = {
+    ordlista: document.getElementById("page-ordlista"),
+    atom: document.getElementById("page-atom"),
+    molekyl: document.getElementById("page-molekyl"),
+    grundamne: document.getElementById("page-grundamne"),
+    periodiska: document.getElementById("page-periodiska"),
+    materia: document.getElementById("page-materia"),
+  };
 
-const validElements = ["väte","syre","kol","järn","guld","koppar","silver"];
+  function showPage(key){
+    Object.values(pages).forEach(p => p.classList.remove("active"));
+    pages[key].classList.add("active");
+    allTabs.forEach(t => t.classList.toggle("active", t.dataset.page === key));
+    window.scrollTo({top:0, behavior:"instant"});
+  }
 
-function checkElements(){
-  const inputs=[g1.value,g2.value,g3.value].map(v=>v.toLowerCase());
-  const ok=inputs.every(v=>validElements.includes(v));
-  result.innerHTML = ok 
-    ? "<span class='good'>Rätt 👍</span>"
-    : "<span class='bad'>Inte helt rätt – prova igen</span>";
-}
+  tabs.addEventListener("click", (e) => {
+    const btn = e.target.closest(".tab");
+    if(!btn) return;
+    showPage(btn.dataset.page);
+  });
+
+  // Grundämneskontroll (litet register)
+  const validElements = [
+    "väte","syre","kol","järn","guld","koppar","silver",
+    "aluminium","kväve","klor","kalcium","natrium"
+  ];
+
+  function normalize(s){
+    return (s||"").trim().toLowerCase();
+  }
+
+  window.checkElements = function(){
+    const inputs = [g1.value, g2.value, g3.value].map(normalize).filter(v=>v.length>0);
+    const res = document.getElementById("result");
+
+    if(inputs.length < 3){
+      res.innerHTML = "<span class='bad'>Skriv tre grundämnen.</span>";
+      return;
+    }
+
+    const unknown = inputs.filter(v => !validElements.includes(v));
+    if(unknown.length === 0){
+      res.innerHTML = "<span class='good'>Rätt 👍 Alla finns i listan.</span>";
+    }else{
+      res.innerHTML = "<span class='bad'>Inte helt rätt: " + unknown.join(", ") + "</span>";
+    }
+  };
+
+  // Periodiska “användning”
+  window.showUse = function(title, text){
+    document.getElementById("useTitle").textContent = title;
+    document.getElementById("useText").textContent = text;
+  };
 </script>
 
 </body>
