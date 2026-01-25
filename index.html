@@ -1,1 +1,258 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fysik & Kemi – Träning</title>
 
+<style>
+body{
+  margin:0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+  background:#f4f6fb;
+  color:#1a1a1a;
+}
+
+header{
+  background:#4f6df5;
+  color:white;
+  padding:16px;
+  text-align:center;
+  font-weight:600;
+}
+
+section{
+  background:white;
+  margin:12px;
+  padding:16px;
+  border-radius:14px;
+}
+
+h2{
+  margin-top:0;
+  font-size:20px;
+}
+
+.flip-grid{
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:10px;
+}
+
+.card{
+  perspective:1000px;
+}
+
+.card-inner{
+  position:relative;
+  width:100%;
+  height:80px;
+  transform-style:preserve-3d;
+  transition:transform 0.6s;
+}
+
+.card.flipped .card-inner{
+  transform:rotateY(180deg);
+}
+
+.card-face{
+  position:absolute;
+  width:100%;
+  height:100%;
+  backface-visibility:hidden;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:8px;
+  text-align:center;
+  font-weight:500;
+}
+
+.front{
+  background:#e8ecff;
+}
+
+.back{
+  background:#dff3e8;
+  transform:rotateY(180deg);
+  font-size:14px;
+}
+
+.atom{
+  text-align:center;
+}
+
+.atom-core{
+  width:40px;
+  height:40px;
+  background:#ff6b6b;
+  border-radius:50%;
+  margin:20px auto;
+}
+
+.electron{
+  width:12px;
+  height:12px;
+  background:#4f6df5;
+  border-radius:50%;
+  position:absolute;
+}
+
+.orbit{
+  position:relative;
+  width:120px;
+  height:120px;
+  border:2px dashed #ccc;
+  border-radius:50%;
+  margin:auto;
+}
+
+input, textarea{
+  width:100%;
+  padding:8px;
+  margin:6px 0;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:16px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+td, th{
+  border:1px solid #ddd;
+  padding:6px;
+}
+
+button{
+  background:#4f6df5;
+  color:white;
+  border:none;
+  padding:10px;
+  border-radius:10px;
+  font-size:16px;
+  width:100%;
+}
+.result{
+  margin-top:6px;
+  font-weight:600;
+}
+.good{color:green;}
+.bad{color:red;}
+</style>
+</head>
+
+<body>
+
+<header>Fysik & Kemi – Träna inför prov</header>
+
+<section>
+<h2>📘 Ordlista</h2>
+<div class="flip-grid" id="ordlista"></div>
+</section>
+
+<section>
+<h2>⚛️ Atom</h2>
+<p>En atom är en pytteliten byggsten som allt i världen är uppbyggt av.</p>
+<div class="orbit">
+  <div class="electron" style="top:-6px; left:50%"></div>
+  <div class="electron" style="bottom:-6px; left:50%"></div>
+  <div class="electron" style="left:-6px; top:50%"></div>
+  <div class="electron" style="right:-6px; top:50%"></div>
+  <div class="atom-core"></div>
+</div>
+</section>
+
+<section>
+<h2>💧 Molekyl</h2>
+<p>När atomer sitter ihop bildar de molekyler.</p>
+<p>Vattenmolekyl: 1 syre + 2 väte = H₂O</p>
+</section>
+
+<section>
+<h2>🧪 Grundämnen</h2>
+<p>Skriv tre grundämnen:</p>
+<input id="g1" placeholder="Grundämne 1">
+<input id="g2" placeholder="Grundämne 2">
+<input id="g3" placeholder="Grundämne 3">
+<button onclick="checkElements()">Kontrollera</button>
+<div id="result" class="result"></div>
+</section>
+
+<section>
+<h2>📊 Periodiska systemet</h2>
+<p>Klicka på ett ämne:</p>
+<button onclick="alert('Syre används för andning och förbränning')">Syre (O)</button><br><br>
+<button onclick="alert('Järn används till spikar, bilar och byggnader')">Järn (Fe)</button><br><br>
+<button onclick="alert('Koppar används i sladdar och elektronik')">Koppar (Cu)</button>
+</section>
+
+<section>
+<h2>🧱 Materia & Material</h2>
+<p><b>Materia:</b> Allt som tar plats och väger något.</p>
+<p><b>Material:</b> Vad saker är gjorda av, t.ex. trä, metall eller plast.</p>
+
+<table>
+<tr><th>Material</th><th>Föremål</th></tr>
+<tr><td><input></td><td><input></td></tr>
+<tr><td><input></td><td><input></td></tr>
+<tr><td><input></td><td><input></td></tr>
+<tr><td><input></td><td><input></td></tr>
+<tr><td><input></td><td><input></td></tr>
+</table>
+</section>
+
+<script>
+const words = {
+  "kemisk":"Som har med kemi att göra",
+  "alkemist":"Person som experimenterade förr i tiden",
+  "experiment":"Ett test man gör",
+  "undersökning":"När man tar reda på något",
+  "grotta":"Hålrum i berg",
+  "material":"Det som något är gjort av",
+  "metall":"Ett hårt material",
+  "atom":"Mycket liten byggsten",
+  "molekyl":"Atomer som sitter ihop",
+  "praktisk":"När man gör själv",
+  "skicklig":"Duktig",
+  "gummi":"Mjukt material",
+  "recept":"Instruktion",
+  "återvinna":"Använda igen",
+  "sortera":"Dela upp",
+  "forskare":"Person som undersöker",
+  "förpackning":"Något som skyddar",
+  "periodiska systemet":"Tabell med alla grundämnen",
+  "grundämne":"Ett ämne med en sorts atom",
+  "brasa":"Eld med ved"
+};
+
+const container = document.getElementById("ordlista");
+
+Object.entries(words).forEach(([word,def])=>{
+  const card=document.createElement("div");
+  card.className="card";
+  card.innerHTML=`
+    <div class="card-inner">
+      <div class="card-face front">${word}</div>
+      <div class="card-face back">${def}</div>
+    </div>`;
+  card.onclick=()=>card.classList.toggle("flipped");
+  container.appendChild(card);
+});
+
+const validElements = ["väte","syre","kol","järn","guld","koppar","silver"];
+
+function checkElements(){
+  const inputs=[g1.value,g2.value,g3.value].map(v=>v.toLowerCase());
+  const ok=inputs.every(v=>validElements.includes(v));
+  result.innerHTML = ok 
+    ? "<span class='good'>Rätt 👍</span>"
+    : "<span class='bad'>Inte helt rätt – prova igen</span>";
+}
+</script>
+
+</body>
+</html>
