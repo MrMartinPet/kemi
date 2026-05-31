@@ -1,584 +1,574 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="sv">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Fysik & Kemi – Träning</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Viljas Musikbegrepp</title>
 
-<style>
-  :root{
-    --bg:#f4f6fb;
-    --card:#ffffff;
-    --primary:#4f6df5;
-    --front:#e8ecff;
-    --back:#dff3e8;
-    --txt:#1a1a1a;
-    --muted:#667085;
-    --radius:14px;
-    --shadow:0 8px 20px rgba(16,24,40,.08);
-    --shadow2:0 6px 14px rgba(16,24,40,.10);
-    --gap:10px;
-  }
+  <style>
+    :root{
+      --bg:#eef4f8;
+      --card:#ffffff;
+      --text:#132033;
+      --muted:#667085;
+      --blue:#156082;
+      --blueLight:#e7f3f7;
+      --green:#21803f;
+      --yellow:#f6c453;
+      --border:#d9e2ea;
+      --shadow:0 12px 28px rgba(20,32,51,.12);
+      --radius:24px;
+    }
 
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui;
-    background:var(--bg);
-    color:var(--txt);
-  }
+    *{
+      box-sizing:border-box;
+      -webkit-tap-highlight-color:transparent;
+    }
 
-  /* Fixed top menu (2 rows, no horizontal scroll) */
-  .topbar{
-    position:fixed;
-    top:0; left:0; right:0;
-    z-index:999;
-    background:var(--primary);
-    color:#fff;
-    padding:calc(10px + env(safe-area-inset-top)) 12px 12px;
-    box-shadow:0 6px 18px rgba(0,0,0,.12);
-  }
-  .title{
-    font-weight:800;
-    text-align:center;
-    padding-bottom:8px;
-    letter-spacing:.2px;
-  }
-  .tabs{
-    display:grid;
-    grid-template-columns:repeat(3, minmax(0, 1fr));
-    gap:8px;
-  }
-  .tab{
-    border:1px solid rgba(255,255,255,.35);
-    background:rgba(255,255,255,.14);
-    color:#fff;
-    padding:8px 8px;
-    border-radius:999px;
-    font-size:13px;
-    font-weight:750;
-    line-height:1.05;
-    text-align:center;
-    white-space:nowrap;
-  }
-  .tab.active{
-    background:#fff;
-    color:var(--primary);
-    border-color:#fff;
-  }
+    body{
+      margin:0;
+      height:100vh;
+      height:100dvh;
+      overflow:hidden;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+      background:linear-gradient(180deg,#dff0f6 0%,var(--bg) 48%);
+      color:var(--text);
+    }
 
-  /* Main content area below fixed header */
-  main{
-    padding-top:138px; /* room for fixed menu */
-    padding-bottom:28px;
-  }
-  .page{
-    display:none;
-    margin:12px;
-    background:var(--card);
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    padding:16px;
-  }
-  .page.active{display:block}
+    .app{
+      height:100dvh;
+      max-width:520px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      padding:14px;
+      gap:10px;
+    }
 
-  h2{
-    margin:0 0 8px 0;
-    font-size:20px;
-  }
-  p{margin:8px 0; line-height:1.35}
-  .hint{
-    font-size:13px;
-    color:var(--muted);
-    margin-top:6px;
-  }
+    header{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:14px;
+      box-shadow:var(--shadow);
+    }
 
-  /* Flipcards */
-  .flip-grid{
-    display:grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap:var(--gap);
-    padding:2px;
-  }
-  .card{ perspective:1000px; }
-  .card-inner{
-    position:relative;
-    width:100%;
-    height:92px;
-    transform-style:preserve-3d;
-    transition:transform .55s;
-  }
-  .card.flipped .card-inner{ transform:rotateY(180deg); }
-  .card-face{
-    position:absolute;
-    inset:0;
-    backface-visibility:hidden;
-    border-radius:12px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:10px;
-    text-align:center;
-    font-weight:750;
-    box-shadow:var(--shadow2);
-  }
-  .front{ background:var(--front); }
-  .back{
-    background:var(--back);
-    transform:rotateY(180deg);
-    font-size:14px;
-    font-weight:650;
-  }
+    .topline{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:8px;
+    }
 
-  /* Atom illustration (bigger + labels) */
-  .atom-wrap{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:10px;
-    margin-top:10px;
-  }
-  .orbit{
-    position:relative;
-    width:220px;
-    height:220px;
-    border:2px dashed #cfd4df;
-    border-radius:50%;
-    margin:6px auto 28px;
-    background:radial-gradient(circle at 50% 50%, rgba(79,109,245,.05), transparent 58%);
-  }
-  .atom-core{
-    width:70px;height:70px;
-    background:#ff6b6b;
-    border-radius:50%;
-    position:absolute;
-    top:50%;left:50%;
-    transform:translate(-50%,-50%);
-    box-shadow:0 14px 26px rgba(255,107,107,.35);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-  .core-label{
-    background:rgba(255,255,255,.9);
-    color:#7a1111;
-    border-radius:10px;
-    padding:6px 8px;
-    font-weight:900;
-    font-size:12px;
-    box-shadow:0 10px 18px rgba(16,24,40,.10);
-  }
-  .electron{
-    width:14px;height:14px;
-    background:var(--primary);
-    border-radius:50%;
-    position:absolute;
-    box-shadow:0 10px 18px rgba(79,109,245,.25);
-  }
-  .elabel{
-    position:absolute;
-    transform:translate(-50%,-50%);
-    background:rgba(255,255,255,.92);
-    border:1px solid #e4e7ec;
-    border-radius:10px;
-    padding:3px 6px;
-    font-size:11px;
-    font-weight:800;
-    color:#344054;
-    box-shadow:0 10px 18px rgba(16,24,40,.08);
-    white-space:nowrap;
-  }
+    .badge{
+      background:var(--blueLight);
+      color:var(--blue);
+      padding:5px 9px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:850;
+      white-space:nowrap;
+    }
 
-  /* Inputs */
-  input, textarea{
-    width:100%;
-    padding:10px 10px;
-    margin:8px 0 0;
-    border-radius:10px;
-    border:1px solid #d0d5dd;
-    font-size:16px;
-    background:#fff;
-  }
-  button.action{
-    background:var(--primary);
-    color:#fff;
-    border:none;
-    padding:12px;
-    border-radius:12px;
-    font-size:16px;
-    width:100%;
-    margin-top:10px;
-    font-weight:800;
-  }
-  .result{ margin-top:10px; font-weight:900; }
-  .good{ color:#1b8f4a; }
-  .bad{ color:#b42318; }
+    .small{
+      color:var(--muted);
+      font-size:13px;
+      font-weight:650;
+    }
 
-  /* Periodic (Top 18) */
-  .grid6{
-    display:grid;
-    grid-template-columns:repeat(3, minmax(0,1fr));
-    gap:10px;
-    margin-top:10px;
-  }
-  .chem-btn{
-    border:1px solid #d0d5dd;
-    background:#fff;
-    border-radius:14px;
-    padding:10px 8px;
-    text-align:center;
-    font-weight:900;
-    box-shadow:0 10px 18px rgba(16,24,40,.06);
-  }
-  .chem-btn small{
-    display:block;
-    margin-top:2px;
-    color:var(--muted);
-    font-weight:800;
-  }
+    h1{
+      margin:0;
+      font-size:27px;
+      line-height:1.05;
+      letter-spacing:-.03em;
+    }
 
-  /* Molecule cards */
-  .molecule-grid{
-    display:grid;
-    grid-template-columns:1fr;
-    gap:10px;
-    margin-top:12px;
-  }
-  .mol-card{
-    background:#fbfcff;
-    border:1px solid #e4e7ec;
-    border-radius:14px;
-    padding:12px;
-    box-shadow:0 10px 18px rgba(16,24,40,.06);
-  }
-  .mol-title{
-    font-weight:900;
-    margin:0 0 6px 0;
-  }
-  .mol-diagram{
-    display:flex;
-    gap:10px;
-    align-items:center;
-    justify-content:center;
-    margin:10px 0 6px;
-    flex-wrap:wrap;
-  }
-  .ball{
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:950;
-    box-shadow:0 12px 18px rgba(16,24,40,.10);
-  }
-  .ball.big{ width:46px; height:46px; }
-  .ball.mid{ width:38px; height:38px; }
-  .ball.small{ width:34px; height:34px; }
+    h2{
+      margin:0 0 8px;
+      font-size:24px;
+      letter-spacing:-.02em;
+    }
 
-  /* Materia/Material split */
-  .split{
-    display:grid;
-    grid-template-columns:1fr;
-    gap:10px;
-    margin-top:10px;
-  }
-  .info-box{
-    border-radius:14px;
-    padding:12px;
-    box-shadow:0 10px 18px rgba(16,24,40,.06);
-    border:1px solid #e4e7ec;
-  }
-  .info-box.materia{ background:var(--front); }
-  .info-box.material{ background:var(--back); }
-  .info-box h3{
-    margin:0 0 6px 0;
-    font-size:16px;
-    font-weight:950;
-  }
-  .info-box p{ margin:0; }
+    p{
+      margin:6px 0;
+      line-height:1.35;
+    }
 
-  /* Table */
-  table{ width:100%; border-collapse:collapse; margin-top:12px; }
-  th, td{ border:1px solid #e4e7ec; padding:8px; vertical-align:top; }
-  th{ background:#f7f8fb; text-align:left; }
-</style>
+    .screen{
+      display:none;
+      flex:1 1 auto;
+      min-height:0;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:14px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .screen.active{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .menuGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      overflow:auto;
+      padding-bottom:2px;
+    }
+
+    button{
+      border:0;
+      border-radius:18px;
+      padding:13px 14px;
+      font-size:15px;
+      font-weight:850;
+      background:var(--blue);
+      color:white;
+      cursor:pointer;
+      min-height:48px;
+    }
+
+    button.secondary{
+      background:#eef2f6;
+      color:var(--text);
+      border:1px solid var(--border);
+    }
+
+    button.green{
+      background:var(--green);
+    }
+
+    button.yellow{
+      background:var(--yellow);
+      color:#302400;
+    }
+
+    .menuBtn{
+      min-height:84px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:flex-start;
+      text-align:left;
+      gap:5px;
+    }
+
+    .menuBtn span{
+      font-size:12px;
+      font-weight:650;
+      opacity:.88;
+    }
+
+    .navRow{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:auto;
+    }
+
+    .counter{
+      text-align:center;
+      color:var(--muted);
+      font-size:13px;
+      font-weight:850;
+    }
+
+    .flashWrap{
+      perspective:1000px;
+      flex:1 1 auto;
+      min-height:260px;
+      display:flex;
+    }
+
+    .flashCard{
+      width:100%;
+      position:relative;
+      transform-style:preserve-3d;
+      transition:transform .55s cubic-bezier(.2,.8,.2,1);
+      cursor:pointer;
+      min-height:260px;
+    }
+
+    .flashCard.flipped{
+      transform:rotateY(180deg);
+    }
+
+    .face{
+      position:absolute;
+      inset:0;
+      border-radius:26px;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      backface-visibility:hidden;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:22px;
+      overflow:hidden;
+    }
+
+    .front{
+      background:linear-gradient(180deg,#ffffff,#f7fafc);
+    }
+
+    .back{
+      background:linear-gradient(180deg,var(--blueLight),#ffffff);
+      transform:rotateY(180deg);
+    }
+
+    .faceLabel{
+      position:absolute;
+      top:14px;
+      left:14px;
+      font-size:12px;
+      font-weight:950;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+
+    .categoryLabel{
+      position:absolute;
+      top:14px;
+      right:14px;
+      font-size:12px;
+      font-weight:900;
+      background:#eef2f6;
+      color:var(--text);
+      border-radius:999px;
+      padding:5px 8px;
+      max-width:48%;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .faceText{
+      font-size:30px;
+      font-weight:950;
+      line-height:1.12;
+      letter-spacing:-.03em;
+      max-width:100%;
+    }
+
+    .back .faceText{
+      font-size:22px;
+      font-weight:850;
+    }
+
+    .tapHint{
+      position:absolute;
+      bottom:14px;
+      color:var(--muted);
+      font-size:13px;
+      font-weight:750;
+    }
+
+    .progressWrap{
+      height:10px;
+      background:#e6edf3;
+      border-radius:999px;
+      overflow:hidden;
+    }
+
+    .progress{
+      height:100%;
+      width:0%;
+      background:var(--blue);
+      transition:.25s;
+    }
+
+    @media(max-width:380px){
+      .app{
+        padding:10px;
+      }
+
+      h1{
+        font-size:24px;
+      }
+
+      .menuBtn{
+        min-height:74px;
+      }
+
+      .faceText{
+        font-size:26px;
+      }
+
+      .back .faceText{
+        font-size:19px;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <div class="app">
+    <header>
+      <div class="topline">
+        <div class="badge">Musik flashcards</div>
+        <div class="small" id="headerInfo">Start</div>
+      </div>
 
-<div class="topbar">
-  <div class="title">Fysik & Kemi – Träna inför prov</div>
-  <div class="tabs" id="tabs">
-    <button class="tab active" data-page="ordlista">Ordlista</button>
-    <button class="tab" data-page="atom">Atom</button>
-    <button class="tab" data-page="molekyl">Molekyl</button>
-    <button class="tab" data-page="grundamne">Grundämne</button>
-    <button class="tab" data-page="periodiska">Periodiska</button>
-    <button class="tab" data-page="materia">Materia/Material</button>
-  </div>
-</div>
+      <h1>Viljas Musikbegrepp</h1>
+      <p class="small">Tryck på kortet. Svara högt. Vänd och kontrollera.</p>
+    </header>
 
-<main>
+    <main id="home" class="screen active">
+      <h2>Välj kategori</h2>
 
-  <section class="page active" id="page-ordlista">
-    <h2>📘 Ordlista</h2>
-    <p class="hint">Tryck på ett kort för att se förklaringen.</p>
-    <div class="flip-grid" id="ordlista"></div>
-  </section>
+      <div class="menuGrid">
+        <button class="menuBtn" onclick="startCategory('grunder')">
+          Grunder
+          <span>Noter, toner, melodi</span>
+        </button>
 
-  <section class="page" id="page-atom">
-    <h2>⚛️ Atom</h2>
-    <p>En atom är en pytteliten byggsten som allt i världen är uppbyggt av.</p>
-    <p class="hint">Atom: en <b>tung kärna</b> i mitten + <b>elektroner</b> runt.</p>
+        <button class="menuBtn" onclick="startCategory('klang')">
+          Klang
+          <span>Dur, moll, ackord</span>
+        </button>
 
-  <div class="atom-wrap">
-  <div class="orbit" aria-label="Enkel atomskiss med etiketter">
+        <button class="menuBtn green" onclick="startCategory('grupper')">
+          Musiker
+          <span>Kör, orkester, solist</span>
+        </button>
 
-    <!-- Elektron upp -->
-    <div class="electron" style="top:-7px; left:50%; transform:translateX(-50%);"></div>
-    <div class="elabel" style="top:34px; left:50%; color:#344054;">
-      elektron
-    </div>
+        <button class="menuBtn green" onclick="startCategory('rytm')">
+          Rytm
+          <span>Puls, rytm, tempo</span>
+        </button>
 
-    <!-- Elektron ner -->
-    <div class="electron" style="bottom:-7px; left:50%; transform:translateX(-50%);"></div>
-    <div class="elabel" style="top:244px; left:50%; color:#344054;">
-      elektron
-    </div>
+        <button class="menuBtn yellow" onclick="startCategory('uttryck')">
+          Uttryck
+          <span>Dynamik, paus, repris</span>
+        </button>
 
-    <!-- Elektron vänster -->
-    <div class="electron" style="left:-7px; top:50%; transform:translateY(-50%);"></div>
-    <div class="elabel" style="top:calc(50% + 26px); left:28px; color:#344054;">
-      elektron
-    </div>
+        <button class="menuBtn yellow" onclick="startCategory('alla')">
+          Alla kort
+          <span>Allt blandat</span>
+        </button>
+      </div>
+    </main>
 
-    <!-- Elektron höger -->
-    <div class="electron" style="right:-7px; top:50%; transform:translateY(-50%);"></div>
-    <div class="elabel" style="top:calc(50% + 26px); left:190px; color:#344054;">
-      elektron
-    </div>
+    <section id="cards" class="screen">
+      <h2 id="categoryTitle">Flashcards</h2>
 
-    <!-- Kärna -->
-    <div class="atom-core"></div>
-    <div class="elabel" style="top:calc(50% + 46px); left:50%; font-weight:700; color:#7a1111;">
-      tung kärna
-    </div>
+      <div class="counter" id="counter">1 av 1</div>
 
-  </div>
+      <div class="progressWrap">
+        <div class="progress" id="progress"></div>
+      </div>
 
-  <div class="hint" style="text-align:center;">
-    Elektronerna snurrar runt kärnan.
-  </div>
-</div>
+      <div class="flashWrap">
+        <div class="flashCard" id="flashCard" onclick="flipCard()">
+          <div class="face front">
+            <div class="faceLabel">Begrepp</div>
+            <div class="categoryLabel" id="frontCategory">Kategori</div>
+            <div class="faceText" id="frontText"></div>
+            <div class="tapHint">Tryck för att vända</div>
+          </div>
 
-  </section>
-
-  <section class="page" id="page-molekyl">
-    <h2>💧 Molekyl</h2>
-    <p>När olika atomer sitter ihop bildar de molekyler.</p>
-
-    <div class="molecule-grid">
-      <div class="mol-card">
-        <p class="mol-title">Vatten – H₂O</p>
-        <div class="mol-diagram">
-          <div class="ball big" style="background:#4f6df5; color:#fff;">O</div>
-          <div class="ball small" style="background:#ffb020; color:#222;">H</div>
-          <div class="ball small" style="background:#ffb020; color:#222;">H</div>
+          <div class="face back">
+            <div class="faceLabel">Förklaring</div>
+            <div class="categoryLabel" id="backCategory">Kategori</div>
+            <div class="faceText" id="backText"></div>
+            <div class="tapHint">Tryck för att vända tillbaka</div>
+          </div>
         </div>
-        <div class="hint" style="text-align:center;">1 syre + 2 väte</div>
       </div>
 
-      <div class="mol-card">
-        <p class="mol-title">Koldioxid – CO₂</p>
-        <div class="mol-diagram">
-          <div class="ball small" style="background:#111827; color:#fff;">O</div>
-          <div class="ball big" style="background:#9aa4b2; color:#111;">C</div>
-          <div class="ball small" style="background:#111827; color:#fff;">O</div>
-        </div>
-        <div class="hint" style="text-align:center;">1 kol + 2 syre</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="page" id="page-grundamne">
-    <h2>🧪 Grundämne</h2>
-    <p>Ett grundämne är ett ämne som består av <b>en enda sorts atomer</b>.</p>
-    <p class="hint">Skriv tre grundämnen. Appen kollar om de finns i listan.</p>
-
-    <input id="g1" placeholder="Grundämne 1" />
-    <input id="g2" placeholder="Grundämne 2" />
-    <input id="g3" placeholder="Grundämne 3" />
-    <button class="action" onclick="checkElements()">Kontrollera</button>
-    <div id="result" class="result"></div>
-  </section>
-
-  <section class="page" id="page-periodiska">
-    <h2>📊 Periodiska systemet (Top 18)</h2>
-    <p class="hint">Tryck på ett ämne för att se vad det kan användas till.</p>
-
-    <div class="grid6">
-      <button class="chem-btn" type="button" onclick="showUse('Väte (H)','Finns i vatten (H₂O) och i många bränslen.')">H<small>Väte</small></button>
-      <button class="chem-btn" type="button" onclick="showUse('Helium (He)','Används i ballonger och som kylning i vissa system.')">He<small>Helium</small></button>
-      <button class="chem-btn" type="button" onclick="showUse('Litium (Li)','Finns i batterier (t.ex. mobilbatterier).')">Li<small>Litium</small></button>
-
-      <button class="chem-btn" type="button" onclick="showUse('Beryllium (Be)','Används i vissa lätta, starka legeringar.')">Be<small>Beryllium</small></button>
-      <button class="chem-btn" type="button" onclick="showUse('Bor (B)','Finns i glas och i vissa rengöringsmedel.')">B<small>Bor</small></button>
-      <button class="chem-btn" type="button" onclick="showUse('Kol (C)','Finns i allt levande och i grafit (pennor).')">C<small>Kol</small></button>
-
-      <button class="chem-btn" type="button" onclick="showUse('Kväve (N)','Finns i luften och används i gödsel och kylning.')">N<small>Kväve</small></button>
-      <button class="chem-btn" type="button" onclick="showUse('Syre (O)','Används för andning och förbränning.')">O<small>Syre</small></button>
-      <button class="chem-btn" type="button" onclick="showUse('Fluor (F)','Finns i tandkräm (fluorider) och i vissa plaster.')">F<small>Fluor</small></button>
-
-      <button class="chem-btn" type="button" onclick="showUse('Neon (Ne)','Används i ljusreklam (neonljus).')">Ne<small>Neon</small></button>
-      <button class="chem-btn" type="button" onclick="showUse('Natrium (Na)','Finns i salt (NaCl) och i vissa lampor.')">Na<small>Natrium</small></button>
-      <button class="chem-btn" type="button" onclick="showUse('Magnesium (Mg)','Finns i metallblandningar och i vissa mediciner.')">Mg<small>Magnesium</small></button>
-
-      <button class="chem-btn" type="button" onclick="showUse('Aluminium (Al)','Används i burkar, cyklar och flygplan.')">Al<small>Aluminium</small></button>
-      <button class="chem-btn" type="button" onclick="showUse('Kisel (Si)','Används i elektronik (datorchip) och i glas.')">Si<small>Kisel</small></button>
-      <button class="chem-btn" type="button" onclick="showUse('Fosfor (P)','Finns i tändstickor och behövs i kroppen.')">P<small>Fosfor</small></button>
-
-      <button class="chem-btn" type="button" onclick="showUse('Svavel (S)','Finns i gummi och i vissa kemikalier.')">S<small>Svavel</small></button>
-      <button class="chem-btn" type="button" onclick="showUse('Klor (Cl)','Används i pooler och i rengöring (klorföreningar).')">Cl<small>Klor</small></button>
-      <button class="chem-btn" type="button" onclick="showUse('Argon (Ar)','Används i lampor och som skyddsgas vid svetsning.')">Ar<small>Argon</small></button>
-    </div>
-
-    <div id="usebox" style="margin-top:12px; padding:12px; border:1px solid #e4e7ec; border-radius:12px; background:#fbfcff;">
-      <b id="useTitle">Välj ett ämne</b>
-      <div id="useText" style="margin-top:6px; color:var(--muted); font-weight:750;"></div>
-    </div>
-  </section>
-
-  <section class="page" id="page-materia">
-    <h2>🧱 Materia & Material</h2>
-
-    <div class="split">
-      <div class="info-box materia">
-        <h3>Materia</h3>
-        <p>Allt som tar plats och väger något.</p>
-        <p class="hint" style="margin-top:6px;">Materia kan inte uppstå eller försvinna, men kan omvandlas.</p>
+      <div class="navRow">
+        <button class="secondary" onclick="previousCard()">Föregående</button>
+        <button onclick="nextCard()">Nästa kort</button>
       </div>
 
-      <div class="info-box material">
-        <h3>Material</h3>
-        <p>Vad något är gjort av, t.ex. trä, metall, glas eller plast.</p>
-        <p class="hint" style="margin-top:6px;">Material kan användas till olika föremål.</p>
-      </div>
-    </div>
+      <button class="secondary" onclick="openHome()">Till meny</button>
+    </section>
+  </div>
 
-    <table>
-      <tr>
-        <th style="width:45%;">Material</th>
-        <th>Föremål (exempel)</th>
-      </tr>
-      <tr><td><input placeholder="Material 1"></td><td><input placeholder="Föremål 1"></td></tr>
-      <tr><td><input placeholder="Material 2"></td><td><input placeholder="Föremål 2"></td></tr>
-      <tr><td><input placeholder="Material 3"></td><td><input placeholder="Föremål 3"></td></tr>
-      <tr><td><input placeholder="Material 4"></td><td><input placeholder="Föremål 4"></td></tr>
-      <tr><td><input placeholder="Material 5"></td><td><input placeholder="Föremål 5"></td></tr>
-    </table>
+  <script>
+    const categories = {
+      grunder:{
+        title:"Grunder",
+        cards:[
+          {
+            q:"Noter",
+            a:"Musikens bokstäver. Ett system för att skriva musik."
+          },
+          {
+            q:"Toner",
+            a:"Ljud som kan sjungas eller spelas."
+          },
+          {
+            q:"Tonhöjd",
+            a:"Hur hög, ljus, eller låg, mörk, en ton är."
+          },
+          {
+            q:"Melodi",
+            a:"En ton i taget som sjungs eller spelas."
+          }
+        ]
+      },
 
-    <div class="hint">Tabellen är tänkt att en vuxen kan kolla i efterhand.</div>
-  </section>
+      klang:{
+        title:"Klang",
+        cards:[
+          {
+            q:"Ackord",
+            a:"Minst tre toner som spelas samtidigt."
+          },
+          {
+            q:"Dur",
+            a:"Ackord som låter glatt."
+          },
+          {
+            q:"Moll",
+            a:"Ackord som låter sorgset."
+          }
+        ]
+      },
 
-</main>
+      grupper:{
+        title:"Musiker",
+        cards:[
+          {
+            q:"Kör",
+            a:"En grupp människor som sjunger tillsammans."
+          },
+          {
+            q:"Orkester",
+            a:"En grupp människor som spelar instrument tillsammans."
+          },
+          {
+            q:"Solist",
+            a:"En person som sjunger eller spelar ensam."
+          }
+        ]
+      },
 
-<script>
-  // Ordlista (flipcards)
-  const words = {
-    "kemisk":"Som har med kemi att göra",
-    "alkemist":"Person som experimenterade förr i tiden",
-    "experiment":"Ett test man gör",
-    "undersökning":"När man tar reda på något",
-    "grotta":"Hålrum i berg",
-    "material":"Det som något är gjort av",
-    "metall":"Ett hårt material",
-    "atom":"Mycket liten byggsten",
-    "molekyl":"Atomer som sitter ihop",
-    "praktisk":"När man gör själv",
-    "skicklig":"Duktig",
-    "gummi":"Mjukt material",
-    "recept":"Instruktion",
-    "återvinna":"Använda igen",
-    "sortera":"Dela upp",
-    "forskare":"Person som undersöker",
-    "förpackning":"Något som skyddar",
-    "periodiska systemet":"Tabell med alla grundämnen",
-    "grundämne":"Ett ämne med en sorts atom",
-    "brasa":"Eld med ved"
-  };
+      rytm:{
+        title:"Rytm",
+        cards:[
+          {
+            q:"Puls",
+            a:"Musikens hjärtslag. Det är lika lång tid mellan varje pulsslag."
+          },
+          {
+            q:"Rytm",
+            a:"Musikens sväng. En blandning av korta och långa toner och pauser."
+          },
+          {
+            q:"Tempo",
+            a:"Musikens hastighet. Hur snabbt eller långsamt pulsen går."
+          }
+        ]
+      },
 
-  const container = document.getElementById("ordlista");
-  Object.entries(words).forEach(([word, def]) => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <div class="card-inner">
-        <div class="card-face front">${word}</div>
-        <div class="card-face back">${def}</div>
-      </div>`;
-    card.addEventListener("click", () => card.classList.toggle("flipped"));
-    container.appendChild(card);
-  });
+      uttryck:{
+        title:"Uttryck",
+        cards:[
+          {
+            q:"Dynamik",
+            a:"Musikens volym. Hur stark eller svag musiken är."
+          },
+          {
+            q:"Paus",
+            a:"Ett uppehåll i musiken. Inga toner sjungs eller spelas."
+          },
+          {
+            q:"Repris",
+            a:"Att sjunga eller spela samma del av låten en gång till."
+          }
+        ]
+      }
+    };
 
-  // Tabs -> pages (no horizontal scroll)
-  const tabs = document.getElementById("tabs");
-  const allTabs = Array.from(tabs.querySelectorAll(".tab"));
-  const pages = {
-    ordlista: document.getElementById("page-ordlista"),
-    atom: document.getElementById("page-atom"),
-    molekyl: document.getElementById("page-molekyl"),
-    grundamne: document.getElementById("page-grundamne"),
-    periodiska: document.getElementById("page-periodiska"),
-    materia: document.getElementById("page-materia"),
-  };
+    let activeCards = [];
+    let activeTitle = "";
+    let currentIndex = 0;
 
-  function showPage(key){
-    Object.values(pages).forEach(p => p.classList.remove("active"));
-    pages[key].classList.add("active");
-    allTabs.forEach(t => t.classList.toggle("active", t.dataset.page === key));
-    window.scrollTo({top:0, behavior:"instant"});
-  }
+    function openHome(){
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+      });
 
-  tabs.addEventListener("click", (e) => {
-    const btn = e.target.closest(".tab");
-    if(!btn) return;
-    showPage(btn.dataset.page);
-  });
-
-  // Grundämneskontroll (utökad lista)
-  const validElements = [
-    "väte","helium","litium","beryllium","bor","kol","kväve","syre","fluor","neon",
-    "natrium","magnesium","aluminium","kisel","fosfor","svavel","klor","argon",
-    "kalium","kalcium","järn","koppar","silver","guld","zink","tenn","bly"
-  ];
-
-  function normalize(s){
-    return (s||"").trim().toLowerCase();
-  }
-
-  window.checkElements = function(){
-    const inputs = [g1.value, g2.value, g3.value].map(normalize).filter(v=>v.length>0);
-    const res = document.getElementById("result");
-
-    if(inputs.length < 3){
-      res.innerHTML = "<span class='bad'>Skriv tre grundämnen.</span>";
-      return;
+      document.getElementById('home').classList.add('active');
+      document.getElementById('headerInfo').textContent = 'Start';
     }
 
-    const unknown = inputs.filter(v => !validElements.includes(v));
-    if(unknown.length === 0){
-      res.innerHTML = "<span class='good'>Rätt 👍 Alla finns i listan.</span>";
-    }else{
-      res.innerHTML = "<span class='bad'>Inte helt rätt: " + unknown.join(", ") + "</span>";
+    function startCategory(key){
+      if(key === 'alla'){
+        activeCards = [];
+
+        Object.keys(categories).forEach(categoryKey => {
+          categories[categoryKey].cards.forEach(card => {
+            activeCards.push({
+              q:card.q,
+              a:card.a,
+              category:categories[categoryKey].title
+            });
+          });
+        });
+
+        activeTitle = "Alla kort";
+      }else{
+        activeCards = categories[key].cards.map(card => {
+          return {
+            q:card.q,
+            a:card.a,
+            category:categories[key].title
+          };
+        });
+
+        activeTitle = categories[key].title;
+      }
+
+      currentIndex = 0;
+
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+      });
+
+      document.getElementById('cards').classList.add('active');
+      document.getElementById('headerInfo').textContent = activeTitle;
+      document.getElementById('categoryTitle').textContent = activeTitle;
+
+      renderCard();
     }
-  };
 
-  // Periodiska “användning”
-  window.showUse = function(title, text){
-    document.getElementById("useTitle").textContent = title;
-    document.getElementById("useText").textContent = text;
-  };
-</script>
+    function renderCard(){
+      const card = activeCards[currentIndex];
+      const progress = Math.round(((currentIndex + 1) / activeCards.length) * 100);
 
+      document.getElementById('frontText').textContent = card.q;
+      document.getElementById('backText').textContent = card.a;
+      document.getElementById('frontCategory').textContent = card.category;
+      document.getElementById('backCategory').textContent = card.category;
+      document.getElementById('counter').textContent = (currentIndex + 1) + ' av ' + activeCards.length;
+      document.getElementById('progress').style.width = progress + '%';
+      document.getElementById('flashCard').classList.remove('flipped');
+    }
+
+    function flipCard(){
+      document.getElementById('flashCard').classList.toggle('flipped');
+    }
+
+    function nextCard(){
+      currentIndex = (currentIndex + 1) % activeCards.length;
+      renderCard();
+    }
+
+    function previousCard(){
+      currentIndex = (currentIndex - 1 + activeCards.length) % activeCards.length;
+      renderCard();
+    }
+  </script>
 </body>
 </html>
